@@ -3,33 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Typing Test - Magnus Style</title>
+  <title>Magnus Scott – Personal Website</title>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Mono&display=swap" rel="stylesheet">
   <style>
     body {
       background: #121212;
       color: #e0e0e0;
       font-family: 'Fira Mono', monospace;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* === Nav bar === */
+    nav {
+      background-color: #1e1e1e;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      justify-content: center;
+      gap: 40px;
+      padding: 20px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    nav a {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-size: 1.1rem;
+      transition: color 0.2s;
+    }
+
+    nav a:hover {
+      color: #6fcf97;
+    }
+
+    .page {
+      display: none;
       padding: 40px;
-      user-select: none;
+      max-width: 800px;
+      margin: auto;
     }
 
-    h1 {
-      margin-bottom: 30px;
+    .active {
+      display: block;
     }
 
+    /* === Typing container === */
     #container {
       position: relative;
-      width: 700px;
       font-size: 1.8rem;
       line-height: 2.2rem;
       background: #1e1e1e;
       padding: 20px;
       border-radius: 10px;
       border: 1px solid #333;
+      margin-top: 30px;
     }
 
     #text-display {
@@ -65,24 +91,73 @@
 
     #stats {
       margin-top: 20px;
-      font-size: 1.3rem;
+      font-size: 1.2rem;
+    }
+
+    h1 {
+      margin-bottom: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Type My Info</h1>
+  <!-- === Navigation Menu === -->
+  <nav>
+    <a href="#" onclick="showPage('home')">Home</a>
+    <a href="#" onclick="showPage('about')">About Me</a>
+    <a href="#" onclick="showPage('skills')">Skills & Projects</a>
+    <a href="#" onclick="showPage('contact')">Contact</a>
+  </nav>
 
-  <div id="container" tabindex="0">
-    <div id="text-display"></div>
-    <textarea id="hidden-input" autofocus spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+  <!-- === Pages === -->
+  <div id="home" class="page active">
+    <h1>Type My Info</h1>
+    <div id="container" tabindex="0">
+      <div id="text-display"></div>
+      <textarea id="hidden-input" autofocus spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+    </div>
+    <div id="stats">
+      WPM: <span id="wpm">0</span> | Accuracy: <span id="accuracy">100</span>%
+    </div>
   </div>
 
-  <div id="stats">
-    WPM: <span id="wpm">0</span> | Accuracy: <span id="accuracy">100</span>%
+  <div id="about" class="page">
+    <h1>About Me</h1>
+    <p>Hello! I'm Magnus Scott, a Mechatronics Engineering student with a passion for robotics, artificial intelligence, and building things that move, sense, and think. I’ve worked on projects across Canada, Germany, and soon — maybe the world.</p>
   </div>
 
+  <div id="skills" class="page">
+    <h1>Skills & Projects</h1>
+    <ul>
+      <li>🛠 Mechanical & Embedded System Design</li>
+      <li>🤖 Robotic Arm Prototyping & Control</li>
+      <li>📊 MATLAB, Python, JavaScript, and C++</li>
+      <li>🌐 Web Dev + IoT Dashboard Projects</li>
+    </ul>
+    <p>Ask me about my closed-loop fire detection system or my work on electric machine thermal modeling!</p>
+  </div>
+
+  <div id="contact" class="page">
+    <h1>Contact Me</h1>
+    <p>📧 magnus@example.com</p>
+    <p>💼 LinkedIn: <a href="https://www.linkedin.com/in/magnusscott" target="_blank">linkedin.com/in/magnusscott</a></p>
+    <p>📍 Based in Stuttgart, Germany (for now!)</p>
+  </div>
+
+  <!-- === Script === -->
   <script>
+    // Navigation Logic
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+
+      // Reset typing test if switching back to Home
+      if (pageId === 'home') {
+        hiddenInput.focus();
+      }
+    }
+
+    // Typing Logic
     const personalInfo = `Hi, I'm Magnus Scott.
 I'm a Mechatronics Engineering student.
 I love robotics, AI, and programming.
@@ -149,10 +224,8 @@ Reach me at magnus@example.com.
       }
     });
 
-    // Initialize
+    // Initial render
     updateDisplay('');
-
-    // Focus hidden input when clicking the container
     document.getElementById('container').addEventListener('click', () => {
       hiddenInput.focus();
     });
