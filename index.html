@@ -3,65 +3,124 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Typing Style Personal Site</title>
+<title>Typing Test - Personal Info</title>
 <style>
   body {
-    background-color: #121212;
+    background: #121212;
     color: #eee;
-    font-family: 'Fira Mono', monospace, monospace;
+    font-family: 'Fira Mono', monospace;
     display: flex;
-    height: 100vh;
-    margin: 0;
-    justify-content: center;
-    align-items: center;
     flex-direction: column;
+    align-items: center;
+    padding: 40px;
   }
-  #typing {
-    font-size: 2rem;
+  #text-to-type {
+    max-width: 700px;
+    font-size: 1.5rem;
     white-space: pre-wrap;
-    max-width: 600px;
-    border-right: 2px solid #eee;
-    padding-right: 5px;
-    animation: blink 1s step-end infinite;
+    border: 1px solid #444;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #222;
+    border-radius: 8px;
   }
-  @keyframes blink {
-    50% { border-color: transparent; }
+  #input-area {
+    width: 700px;
+    padding: 15px;
+    font-size: 1.5rem;
+    border-radius: 8px;
+    border: 1px solid #555;
+    background: #333;
+    color: #eee;
+    outline: none;
+  }
+  #results {
+    margin-top: 20px;
+    font-size: 1.25rem;
+  }
+  .correct {
+    color: #6fcf97;
+  }
+  .incorrect {
+    color: #eb5757;
   }
 </style>
 </head>
 <body>
-  <div id="typing"></div>
 
-  <script>
-    const info = [
-      "Hi, I'm Magnus Scott.\n",
-      "I'm a Mechatronics Engineering student.\n",
-      "I love building robotics and AI projects.\n",
-      "You can reach me at magnus@example.com.\n"
-    ];
+<h1>Type My Personal Info</h1>
 
-    const typingElement = document.getElementById("typing");
-    let text = "";
-    let infoIndex = 0;
-    let charIndex = 0;
+<div id="text-to-type"></div>
+<textarea id="input-area" rows="6" placeholder="Start typing here..."></textarea>
 
-    function type() {
-      if (infoIndex < info.length) {
-        if (charIndex < info[infoIndex].length) {
-          text += info[infoIndex].charAt(charIndex);
-          typingElement.textContent = text;
-          charIndex++;
-          setTimeout(type, 50); // typing speed
-        } else {
-          text += "\n";
-          infoIndex++;
-          charIndex = 0;
-          setTimeout(type, 800); // pause between lines
-        }
-      }
+<div id="results"></div>
+
+<script>
+  const personalInfo = `Hi, I'm Magnus Scott.
+I'm a Mechatronics Engineering student.
+I love robotics, AI, and programming.
+Reach me at magnus@example.com.
+`;
+
+  const textToTypeEl = document.getElementById('text-to-type');
+  const inputArea = document.getElementById('input-area');
+  const resultsEl = document.getElementById('results');
+
+  textToTypeEl.textContent = personalInfo;
+
+  let startTime = null;
+  let timerRunning = false;
+
+  function calculateWPM(timeElapsed, charCount) {
+    // Words per minute (assuming 5 chars per word)
+    return Math.round((charCount / 5) / (timeElapsed / 60000));
+  }
+
+  function calculateAccuracy(original, typed) {
+    let correctChars = 0;
+    for (let i = 0; i < typed.length; i++) {
+      if (typed[i] === original[i]) correctChars++;
+    }
+    return ((correctChars / typed.length) * 100).toFixed(2);
+  }
+
+  inputArea.addEventListener('input', () => {
+    if (!timerRunning) {
+      startTime = Date.now();
+      timerRunning = true;
     }
 
-    type();
-  </script>
+    const typedText = inputArea.value;
+    const originalText = personalInfo;
+
+    // Highlight typed text correctness
+    let displayHTML = '';
+    for (let i = 0; i < originalText.length; i++) {
+      if (i < typedText.length) {
+        if (typedText[i] === originalText[i]) {
+          displayHTML += `<span class="correct">${originalText[i]}</span>`;
+        } else {
+          displayHTML += `<span class="incorrect">${originalText[i]}</span>`;
+        }
+      } else {
+        displayHTML += originalText[i];
+      }
+    }
+    textToTypeEl.innerHTML = displayHTML;
+
+    // When finished
+    if (typedText === originalText) {
+      const timeElapsed = Date.now() - startTime;
+      const wpm = calculateWPM(timeElapsed, typedText.length);
+      const accuracy = calculateAccuracy(originalText, typedText);
+
+      resultsEl.innerHTML = `Finished!<br>WPM: <strong>${wpm}</strong><br>Accuracy: <strong>${accuracy}%</strong>`;
+      inputArea.disabled = true;
+    } else {
+      resultsEl.textContent = '';
+    }
+  });
+</script>
+
 </body>
 </html>
