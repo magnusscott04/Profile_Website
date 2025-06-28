@@ -1,161 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Typing Test - Monkeytype Style</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Fira+Mono&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Typing Test - Magnus Style</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Mono&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: #121212;
+      color: #e0e0e0;
+      font-family: 'Fira Mono', monospace;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+      user-select: none;
+    }
 
-  body {
-    background: #121212;
-    color: #e0e0e0;
-    font-family: 'Fira Mono', monospace;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px;
-    user-select: none;
-  }
+    h1 {
+      margin-bottom: 30px;
+    }
 
-  #container {
-    position: relative;
-    max-width: 700px;
-    font-size: 1.8rem;
-    line-height: 2.2rem;
-    border: 1px solid #333;
-    padding: 20px;
-    border-radius: 8px;
-    background: #1e1e1e;
-  }
+    #container {
+      position: relative;
+      width: 700px;
+      font-size: 1.8rem;
+      line-height: 2.2rem;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #333;
+    }
 
-  #text-display {
-    white-space: pre-wrap;
-    color: #888;
-  }
+    #text-display {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
 
-  #text-display .correct {
-    color: #6fcf97;
-  }
+    #text-display span {
+      display: inline-block;
+    }
 
-  #text-display .incorrect {
-    color: #eb5757;
-  }
+    .correct {
+      color: #6fcf97;
+    }
 
-  /* Invisible input to capture typing */
-  #hidden-input {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: transparent;
-    color: transparent;
-    border: none;
-    caret-color: white;
-    font-family: inherit;
-    font-size: inherit;
-    line-height: inherit;
-    resize: none;
-    outline: none;
-  }
+    .incorrect {
+      color: #eb5757;
+    }
 
-  #stats {
-    margin-top: 20px;
-    font-size: 1.3rem;
-  }
-</style>
+    #hidden-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      caret-color: white;
+      font: inherit;
+      border: none;
+      outline: none;
+      resize: none;
+    }
+
+    #stats {
+      margin-top: 20px;
+      font-size: 1.3rem;
+    }
+  </style>
 </head>
 <body>
 
-<h1>Type My Personal Info</h1>
+  <h1>Type My Info</h1>
 
-<div id="container" tabindex="0">
-  <pre id="text-display"></pre>
-  <textarea id="hidden-input" autofocus spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-</div>
+  <div id="container" tabindex="0">
+    <div id="text-display"></div>
+    <textarea id="hidden-input" autofocus spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+  </div>
 
-<div id="stats">
-  WPM: <span id="wpm">0</span> | Accuracy: <span id="accuracy">100</span>%
-</div>
+  <div id="stats">
+    WPM: <span id="wpm">0</span> | Accuracy: <span id="accuracy">100</span>%
+  </div>
 
-<script>
-  const personalInfo = `Hi, I'm Magnus Scott.
+  <script>
+    const personalInfo = `Hi, I'm Magnus Scott.
 I'm a Mechatronics Engineering student.
 I love robotics, AI, and programming.
 Reach me at magnus@example.com.
 `;
 
-  const textDisplay = document.getElementById('text-display');
-  const hiddenInput = document.getElementById('hidden-input');
-  const wpmDisplay = document.getElementById('wpm');
-  const accuracyDisplay = document.getElementById('accuracy');
+    const textDisplay = document.getElementById('text-display');
+    const hiddenInput = document.getElementById('hidden-input');
+    const wpmDisplay = document.getElementById('wpm');
+    const accuracyDisplay = document.getElementById('accuracy');
 
-  let startTime = null;
-  let timerRunning = false;
+    let startTime = null;
+    let timerRunning = false;
 
-  function calculateWPM(timeElapsed, charCount) {
-    return Math.round((charCount / 5) / (timeElapsed / 60000)) || 0;
-  }
-
-  function calculateAccuracy(original, typed) {
-    if (typed.length === 0) return 100;
-    let correct = 0;
-    for (let i = 0; i < typed.length; i++) {
-      if (typed[i] === original[i]) correct++;
+    function calculateWPM(timeElapsed, charCount) {
+      return Math.round((charCount / 5) / (timeElapsed / 60000)) || 0;
     }
-    return Math.round((correct / typed.length) * 100);
-  }
 
-  function updateDisplay(typed) {
-    let html = '';
-    for (let i = 0; i < personalInfo.length; i++) {
-      const char = personalInfo[i];
-      if (i < typed.length) {
-        if (typed[i] === char) {
-          html += `<span class="correct">${char}</span>`;
-        } else {
-          html += `<span class="incorrect">${char}</span>`;
-        }
-      } else {
-        html += char;
+    function calculateAccuracy(original, typed) {
+      if (typed.length === 0) return 100;
+      let correct = 0;
+      for (let i = 0; i < typed.length; i++) {
+        if (typed[i] === original[i]) correct++;
       }
-    }
-    textDisplay.innerHTML = html;
-  }
-
-  hiddenInput.addEventListener('input', () => {
-    const typed = hiddenInput.value;
-
-    if (!timerRunning && typed.length > 0) {
-      startTime = Date.now();
-      timerRunning = true;
+      return Math.round((correct / typed.length) * 100);
     }
 
-    updateDisplay(typed);
-
-    if (typed.length > 0) {
-      const elapsed = Date.now() - startTime;
-      const wpm = calculateWPM(elapsed, typed.length);
-      const accuracy = calculateAccuracy(personalInfo, typed);
-      wpmDisplay.textContent = wpm;
-      accuracyDisplay.textContent = accuracy;
-    } else {
-      wpmDisplay.textContent = 0;
-      accuracyDisplay.textContent = 100;
+    function updateDisplay(typed) {
+      let html = '';
+      for (let i = 0; i < personalInfo.length; i++) {
+        const char = personalInfo[i];
+        if (i < typed.length) {
+          html += `<span class="${typed[i] === char ? 'correct' : 'incorrect'}">${char}</span>`;
+        } else {
+          html += `<span>${char}</span>`;
+        }
+      }
+      textDisplay.innerHTML = html;
     }
 
-    // When finished typing the full text
-    if (typed === personalInfo) {
-      hiddenInput.disabled = true;
-    }
-  });
+    hiddenInput.addEventListener('input', () => {
+      const typed = hiddenInput.value;
 
-  // Initialize display
-  updateDisplay('');
+      if (!timerRunning && typed.length > 0) {
+        startTime = Date.now();
+        timerRunning = true;
+      }
 
-  // Focus input container on click (to focus hidden textarea)
-  document.getElementById('container').addEventListener('click', () => {
-    hiddenInput.focus();
-  });
-</script>
+      updateDisplay(typed);
+
+      if (typed.length > 0) {
+        const elapsed = Date.now() - startTime;
+        const wpm = calculateWPM(elapsed, typed.length);
+        const accuracy = calculateAccuracy(personalInfo, typed);
+        wpmDisplay.textContent = wpm;
+        accuracyDisplay.textContent = accuracy;
+      } else {
+        wpmDisplay.textContent = 0;
+        accuracyDisplay.textContent = 100;
+      }
+
+      if (typed === personalInfo) {
+        hiddenInput.disabled = true;
+      }
+    });
+
+    // Initialize
+    updateDisplay('');
+
+    // Focus hidden input when clicking the container
+    document.getElementById('container').addEventListener('click', () => {
+      hiddenInput.focus();
+    });
+  </script>
 
 </body>
 </html>
