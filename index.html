@@ -3,46 +3,63 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Typing Test - Personal Info</title>
+<title>Typing Test - Monkeytype Style</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Fira+Mono&display=swap');
+
   body {
     background: #121212;
-    color: #eee;
+    color: #e0e0e0;
     font-family: 'Fira Mono', monospace;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 40px;
+    user-select: none;
   }
-  #text-to-type {
+
+  #container {
+    position: relative;
     max-width: 700px;
-    font-size: 1.5rem;
-    white-space: pre-wrap;
-    border: 1px solid #444;
+    font-size: 1.8rem;
+    line-height: 2.2rem;
+    border: 1px solid #333;
     padding: 20px;
-    margin-bottom: 20px;
-    background: #222;
     border-radius: 8px;
+    background: #1e1e1e;
   }
-  #input-area {
-    width: 700px;
-    padding: 15px;
-    font-size: 1.5rem;
-    border-radius: 8px;
-    border: 1px solid #555;
-    background: #333;
-    color: #eee;
-    outline: none;
+
+  #text-display {
+    white-space: pre-wrap;
+    color: #888;
   }
-  #results {
-    margin-top: 20px;
-    font-size: 1.25rem;
-  }
-  .correct {
+
+  #text-display .correct {
     color: #6fcf97;
   }
-  .incorrect {
+
+  #text-display .incorrect {
     color: #eb5757;
+  }
+
+  /* Invisible input to capture typing */
+  #hidden-input {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: transparent;
+    color: transparent;
+    border: none;
+    caret-color: white;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    resize: none;
+    outline: none;
+  }
+
+  #stats {
+    margin-top: 20px;
+    font-size: 1.3rem;
   }
 </style>
 </head>
@@ -50,10 +67,14 @@
 
 <h1>Type My Personal Info</h1>
 
-<div id="text-to-type"></div>
-<textarea id="input-area" rows="6" placeholder="Start typing here..."></textarea>
+<div id="container" tabindex="0">
+  <pre id="text-display"></pre>
+  <textarea id="hidden-input" autofocus spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+</div>
 
-<div id="results"></div>
+<div id="stats">
+  WPM: <span id="wpm">0</span> | Accuracy: <span id="accuracy">100</span>%
+</div>
 
 <script>
   const personalInfo = `Hi, I'm Magnus Scott.
@@ -62,63 +83,77 @@ I love robotics, AI, and programming.
 Reach me at magnus@example.com.
 `;
 
-  const textToTypeEl = document.getElementById('text-to-type');
-  const inputArea = document.getElementById('input-area');
-  const resultsEl = document.getElementById('results');
-
-  textToTypeEl.textContent = personalInfo;
+  const textDisplay = document.getElementById('text-display');
+  const hiddenInput = document.getElementById('hidden-input');
+  const wpmDisplay = document.getElementById('wpm');
+  const accuracyDisplay = document.getElementById('accuracy');
 
   let startTime = null;
   let timerRunning = false;
 
   function calculateWPM(timeElapsed, charCount) {
-    // Words per minute (assuming 5 chars per word)
-    return Math.round((charCount / 5) / (timeElapsed / 60000));
+    return Math.round((charCount / 5) / (timeElapsed / 60000)) || 0;
   }
 
   function calculateAccuracy(original, typed) {
-    let correctChars = 0;
+    if (typed.length === 0) return 100;
+    let correct = 0;
     for (let i = 0; i < typed.length; i++) {
-      if (typed[i] === original[i]) correctChars++;
+      if (typed[i] === original[i]) correct++;
     }
-    return ((correctChars / typed.length) * 100).toFixed(2);
+    return Math.round((correct / typed.length) * 100);
   }
 
-  inputArea.addEventListener('input', () => {
-    if (!timerRunning) {
+  function updateDisplay(typed) {
+    let html = '';
+    for (let i = 0; i < personalInfo.length; i++) {
+      const char = personalInfo[i];
+      if (i < typed.length) {
+        if (typed[i] === char) {
+          html += `<span class="correct">${char}</span>`;
+        } else {
+          html += `<span class="incorrect">${char}</span>`;
+        }
+      } else {
+        html += char;
+      }
+    }
+    textDisplay.innerHTML = html;
+  }
+
+  hiddenInput.addEventListener('input', () => {
+    const typed = hiddenInput.value;
+
+    if (!timerRunning && typed.length > 0) {
       startTime = Date.now();
       timerRunning = true;
     }
 
-    const typedText = inputArea.value;
-    const originalText = personalInfo;
+    updateDisplay(typed);
 
-    // Highlight typed text correctness
-    let displayHTML = '';
-    for (let i = 0; i < originalText.length; i++) {
-      if (i < typedText.length) {
-        if (typedText[i] === originalText[i]) {
-          displayHTML += `<span class="correct">${originalText[i]}</span>`;
-        } else {
-          displayHTML += `<span class="incorrect">${originalText[i]}</span>`;
-        }
-      } else {
-        displayHTML += originalText[i];
-      }
-    }
-    textToTypeEl.innerHTML = displayHTML;
-
-    // When finished
-    if (typedText === originalText) {
-      const timeElapsed = Date.now() - startTime;
-      const wpm = calculateWPM(timeElapsed, typedText.length);
-      const accuracy = calculateAccuracy(originalText, typedText);
-
-      resultsEl.innerHTML = `Finished!<br>WPM: <strong>${wpm}</strong><br>Accuracy: <strong>${accuracy}%</strong>`;
-      inputArea.disabled = true;
+    if (typed.length > 0) {
+      const elapsed = Date.now() - startTime;
+      const wpm = calculateWPM(elapsed, typed.length);
+      const accuracy = calculateAccuracy(personalInfo, typed);
+      wpmDisplay.textContent = wpm;
+      accuracyDisplay.textContent = accuracy;
     } else {
-      resultsEl.textContent = '';
+      wpmDisplay.textContent = 0;
+      accuracyDisplay.textContent = 100;
     }
+
+    // When finished typing the full text
+    if (typed === personalInfo) {
+      hiddenInput.disabled = true;
+    }
+  });
+
+  // Initialize display
+  updateDisplay('');
+
+  // Focus input container on click (to focus hidden textarea)
+  document.getElementById('container').addEventListener('click', () => {
+    hiddenInput.focus();
   });
 </script>
 
